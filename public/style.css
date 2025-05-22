@@ -1,0 +1,20 @@
+body, html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #000;
+  color: #fff;
+  overflow: hidden; /* Prevent scrollbars on body */
+}
+
+#terminal {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+/* You might need to adjust the xterm viewport/screen if you see scrollbars */
+/* This can be more involved and might require JavaScript adjustments if xterm.js doesn't handle it perfectly with FitAddon */
+.xterm .xterm-viewport {
+  overflow-y: hidden !important; /* Try to hide xterm's own scrollbar if FitAddon is working */
+}
