@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Web Terminal</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css" />
+    <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.js"></script>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div id="terminal"></div>
+    <script>
+      const terminalContainer = document.getElementById('terminal');
+      const term = new Terminal({
+        cursorBlink: true,
+        rows: 24, // Initial rows, will be adjusted by FitAddon
+        cols: 80  // Initial cols, will be adjusted by FitAddon
+      });
+      const fitAddon = new FitAddon.FitAddon();
+      term.loadAddon(fitAddon);
+
+      term.open(terminalContainer);
+      fitAddon.fit(); // Fit terminal to container
+
+      const protocol = (location.protocol === 'https:') ? 'wss://' : 'ws://';
+      const socketURL = protocol + location.hostname + ((location.port) ? (':' + location.port) : '') + '/terminals/';
+      const ws = new WebSocket(socketURL);
+
+      ws.onopen = () => {
+        console.log('WebSocket connection opened');
+        // Send initial size to backend
+        ws.send(JSON.stringify({ type: 'resize', cols: term.cols, rows: term.rows }));
+      };
+
+      ws.onmessage = (event) => {
+        // Assuming backend sends plain text data for the terminal
+        term.write(event.data);
+      };
+
+      ws.onerror = (error) => {
+        console.error('WebSocket Error: ', error);
+        term.write('\r\nWebSocket connection error. Please check the server.\r\n');
+      };
+
+      ws.onclose = () => {
+        console.log('WebSocket connection closed');
+        term.write('\r\nWebSocket connection closed.\r\n');
+      };
+
+      term.onData((data) => {
+        // Send user input to the backend
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ type: 'data', data: data }));
+        }
+      });
+      
+      // Handle resize
+      window.addEventListener('resize', () => {
+        fitAddon.fit();
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ type: 'resize', cols: term.cols, rows: term.rows }));
+        }
+      });
+
+      // Initial fit after a short delay to ensure layout is stable
+      setTimeout(() => {
+        fitAddon.fit();
+        if (ws.readyState === WebSocket.OPEN) {
+           ws.send(JSON.stringify({ type: 'resize', cols: term.cols, rows: term.rows }));
+        }
+      }, 100);
+
+    </script>
+  </body>
+</html>

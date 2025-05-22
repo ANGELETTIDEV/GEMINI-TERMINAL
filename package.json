@@ -1,0 +1,25 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ANGELETTIDEV/GEMINI-TERMINAL.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ANGELETTIDEV/GEMINI-TERMINAL/issues"
+  },
+  "homepage": "https://github.com/ANGELETTIDEV/GEMINI-TERMINAL#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "express-ws": "^5.0.2",
+    "node-pty": "^1.0.0"
+  }
+}
